@@ -4,7 +4,7 @@ from api.base.models import BaseModel
 from django.core.validators import FileExtensionValidator
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
+from api.content.models import Channel
 import uuid
 import random
 from datetime import datetime, timedelta
@@ -76,6 +76,8 @@ class User(AbstractUser, BaseModel):
 
     def save(self, *args, **kwargs):
         self.clean()
+        # if self.auth_status == "complate":
+        #     channel = Channel.objects.create(user=self, name=self.request.username)
         super(User, self).save(*args, **kwargs)
 
     def clean(self) -> None:
