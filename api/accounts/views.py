@@ -2,9 +2,18 @@ from django.shortcuts import render
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from .serializers import SignupSerializer, PersonalDataSerializer
+from .serializers import (
+    SignupSerializer,
+    PersonalDataSerializer,
+    LoginSerializer,
+    LogoutSerializer,
+    UpdateAccessTokenSerizlizer
+)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from datetime import datetime
 
@@ -53,28 +62,60 @@ class VerifyCodeApiView(APIView):
 
 
 class PersonalDataApiView(UpdateAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = PersonalDataSerializer
     http_method_names = ["put", "patch"]
 
     def get_object(self):
         return self.request.user
-    
 
     def update(self, request, *args, **kwargs):
         super(PersonalDataApiView, self).update(request, *args, **kwargs)
         data = {
             "status": True,
             "message": "Ro'yhatdan o'tdingiz",
-            "auth_status": self.request.user.auth_status
+            "auth_status": self.request.user.auth_status,
         }
         return Response(data=data)
-    
+
     def partial_update(self, request, *args, **kwargs):
         super(PersonalDataApiView, self).partial_update(request, *args, **kwargs)
         data = {
             "status": True,
             "message": "Ro'yhatdan o'tdingiz",
-            "auth_status": self.request.user.auth_status
+            "auth_status": self.request.user.auth_status,
         }
         return Response(data=data)
+
+
+class LoginApiView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
+
+class LogoutApiView(APIView):
+    serializer_class = LogoutSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            refresh_token = self.request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            print(token, "---------------------------------------------->>>>")
+            token.blacklist()
+            data = {
+                "status": True,
+                "message": "Siz tizimdan chiqdingiz..."
+            }
+            return Response(data=data, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            data = {
+                "status": False,
+                "message": f"{e}"
+            }
+            return Response(data=data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class UpdateAccessTokenApiView(TokenRefreshView):
+    serializer_class = UpdateAccessTokenSerizlizer
