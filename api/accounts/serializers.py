@@ -12,7 +12,7 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework_simplejwt import tokens
 from django.contrib.auth import authenticate
-
+from api.content.models import Channel
 
 class SignupSerializer(serializers.ModelSerializer):
     ### The hereto function is for new field adding
@@ -93,6 +93,8 @@ class PersonalDataSerializer(serializers.Serializer):
         if instance.auth_status == "verify_code":
             instance.auth_status = "complate"
         instance.save()
+        user = User.objects.get(username=instance.username) 
+        Channel.objects.create(user=user, name=user.username)  ####### Channel is created there
         return instance
 
 

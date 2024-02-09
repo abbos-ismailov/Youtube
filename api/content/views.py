@@ -7,7 +7,9 @@ from rest_framework import permissions
 # Create your views here.
 
 class VideoListApiView(generics.ListAPIView):
-    queryset = Video.objects.all()
     pagination_class = CustomPaginator
+    queryset = Video.objects.all()
     serializer_class = VideoSerializer
-    permission_classes = [permissions.AllowAny, ] 
+    permission_classes = [permissions.AllowAny, ]
+
+
