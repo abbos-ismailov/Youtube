@@ -25,10 +25,7 @@ class VideoCreateApiView(views.APIView):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
     def post(self, request):
-        print(request.user.id, "------------------------>>>>>>>>>>>> user id")
-        user = get_object_or_404(User, username=request.user)
-        request.data["author"] = user.id
-        print(request.data, "------------------------------------------------------ request data ")
+        request.data["author"] = request.user.id
         data = request.data
         serializer = self.serializer_class(data=data)
         if serializer.is_valid(raise_exception=True):

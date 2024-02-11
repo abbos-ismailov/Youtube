@@ -13,6 +13,7 @@ class VideoSerializer(serializers.ModelSerializer):
             "uuid",
             "create_at",
             "title",
+            "description",
             "author",
             "file",
             "video_like_count",
