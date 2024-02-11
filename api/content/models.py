@@ -8,7 +8,7 @@ from api.accounts.models import User
 class Channel(BaseContentModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    banner = models.ImageField(upload_to="channel-banner/", null=True, blank=True)
+    banner = models.ImageField(upload_to="pictures/channel-banner/", null=True, blank=True)
     avatar = models.ImageField(upload_to="user-avatars/", null=True, blank=True)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_channel"
@@ -64,7 +64,7 @@ class VideoLike(BaseContentModel):
     )  ### in default situation, it isn't created. if user clicks like, it will be created
 
     def __str__(self) -> str:
-        return f"{self.user.username} dislike={self.dislike}"
+        return f"{self.user.username} --> dislike={self.dislike}"
 
 
 class VideoComment(BaseContentModel):
@@ -76,11 +76,11 @@ class VideoComment(BaseContentModel):
     )
     comment = models.TextField()
     parent = models.ForeignKey(
-        "self", on_delete=models.CASCADE, related_name="comment_children"
+        "self", on_delete=models.CASCADE, related_name="comment_children", null=True, blank=True
     )
 
     def __str__(self) -> str:
-        return f"{self.user.username} {self.video.title}"
+        return f"user-{self.user.username}; ---- title-{self.video.title}"
 
 
 class CommentLike(BaseContentModel):
